@@ -287,19 +287,21 @@ namespace Context
         }
 
         [TestMethod]
-        public void TestNavigationPropertyWhenEntityDoesNotExists()
+        public void TestNavigationPropertyWhenEntityNotKnown()
         {
+            ChildEntity childEntity;
             using (var context = new DbContextExampleEntities())
             {
                 // Arrange
-                var childEntity = new ChildEntity();
+                childEntity = new ChildEntity();
                 context.ChildEntities.Add(childEntity);
                 context.SaveChanges();
+                context.Entry(childEntity).State = EntityState.Detached;
 
-                var entity = context.Entities.Create();
+                var entity = new Entity();
+                entity.ChildEntityID = childEntity.ChildEntityID;
                 context.Entities.Add(entity);
                 context.SaveChanges();
-                entity.ChildEntityID = childEntity.ChildEntityID;
                 
                 // Act
                 var navigationProperty = entity.ChildEntity;
@@ -309,18 +311,19 @@ namespace Context
             }
         }
 
-        
-        /*[TestMethod]
-        public void TestNavigationPropertySettingIdWithSaveChanges()
+        [TestMethod]
+        public void TestNavigationPropertyWhenEntityNotKnownFixed()
         {
+            ChildEntity childEntity;
             using (var context = new DbContextExampleEntities())
             {
                 // Arrange
-                var childEntity = new ChildEntity();
+                childEntity = new ChildEntity();
                 context.ChildEntities.Add(childEntity);
                 context.SaveChanges();
+                context.Entry(childEntity).State = EntityState.Detached;
 
-                var entity = new Entity();
+                var entity = context.Entities.Create();
                 entity.ChildEntityID = childEntity.ChildEntityID;
                 context.Entities.Add(entity);
                 context.SaveChanges();
@@ -332,95 +335,6 @@ namespace Context
                 Assert.IsNotNull(navigationProperty);
             }
         }
-
-        [TestMethod]
-        public void TestIdSettingNavigationPropertyWithoutSaveChanges()
-        {
-            using (var context = new DbContextExampleEntities())
-            {
-                // Arrange
-                var childEntity = new ChildEntity();
-                context.ChildEntities.Add(childEntity);
-                context.SaveChanges();
-
-                var entity = new Entity();
-                entity.ChildEntity = childEntity;
-
-                // Act
-                bool hasId = entity.ChildEntityID.HasValue;
-
-                // Assert
-                Assert.IsTrue(hasId);
-            }
-        }
-
-        [TestMethod]
-        public void TestIdSettingNavigationPropertyWithoutSaveChangesFixed()
-        {
-            using (var context = new DbContextExampleEntities())
-            {
-                // Arrange
-                var childEntity = new ChildEntity();
-                context.ChildEntities.Add(childEntity);
-                context.SaveChanges();
-
-                var entity = new Entity();
-                entity.ChildEntity = childEntity;
-                context.Entities.Add(entity);
-
-                // Act
-                bool hasId = entity.ChildEntityID.HasValue;
-
-                // Assert
-                Assert.IsTrue(hasId);
-            }
-        }
-
-        [TestMethod]
-        public void TestIdSettingNavigationPropertyWithSaveChanges()
-        {
-            using (var context = new DbContextExampleEntities())
-            {
-                // Arrange
-                var childEntity = new ChildEntity();
-                context.ChildEntities.Add(childEntity);
-                context.SaveChanges();
-
-                var entity = new Entity();
-                entity.ChildEntity = childEntity;
-                context.SaveChanges();
-
-                // Act
-                bool hasId = entity.ChildEntityID.HasValue;
-
-                // Assert
-                Assert.IsTrue(hasId);
-            }
-        }
-
-        [TestMethod]
-        public void TestIdSettingNavigationPropertyWithSaveChangesFixed()
-        {
-            using (var context = new DbContextExampleEntities())
-            {
-                // Arrange
-                var childEntity = new ChildEntity();
-                context.ChildEntities.Add(childEntity);
-                context.SaveChanges();
-
-                var entity = new Entity();
-                entity.ChildEntity = childEntity;
-                context.Entities.Add(entity);
-                context.SaveChanges();
-
-                // Act
-                bool hasId = entity.ChildEntityID.HasValue;
-
-                // Assert
-                Assert.IsTrue(hasId);
-            }
-        }
-        */
         #endregion
     }
 }
